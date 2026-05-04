@@ -1,0 +1,35 @@
+# Build output
+bin/
+obj/
+
+# VS Code
+.vscode/
+
+# User-specific files
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Rider
+.idea/
+
+# Logs
+*.log
+
+# NuGet
+*.nupkg
+*.snupkg
+.nuget/
+packages/
+
+# dotnet tools
+.dotnet/
+
+# Secrets / config overrides
+appsettings.Local.json
+secrets.json
+
+# OS
+.DS_Store
+Thumbs.db
