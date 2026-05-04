@@ -1,24 +1,42 @@
 using CryptidCare.Controllers;
+using CryptidCare.Data;
+using CryptidCare.Data.Repositories;
 using CryptidCare.Models;
 using CryptidCare.Services;
 using CryptidCare.Services.Rules;
+using Microsoft.Data.Sqlite;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace CryptidCare.Tests;
 
-public class ClaimsControllerTests
+public class ClaimsControllerTests : IDisposable
 {
     private readonly ClaimsController _controller;
+    private readonly SqliteConnection _connection;
 
     public ClaimsControllerTests()
     {
+        _connection = new SqliteConnection("Data Source=:memory:");
+        _connection.Open();
+
         var services = new ServiceCollection();
         services.AddScoped<IClaimRule, SilverAllergyRule>();
         services.AddScoped<IClaimRule, HydraHeadMultiplierRule>();
         services.AddScoped<IClaimService, ClaimService>();
+        services.AddDbContext<CryptidCareDbContext>(o =>
+            o.UseSqlite(_connection));
+        services.AddScoped<IPatientRepository, PatientRepository>();
+        services.AddScoped<IMedicineRepository, MedicineRepository>();
+        services.AddScoped<IClaimRepository, ClaimRepository>();
         services.AddScoped<ClaimsController>();
-        _controller = services.BuildServiceProvider().GetRequiredService<ClaimsController>();
+
+        var provider = services.BuildServiceProvider();
+        provider.GetRequiredService<CryptidCareDbContext>().Database.EnsureCreated();
+        _controller = provider.GetRequiredService<ClaimsController>();
     }
+
+    public void Dispose() => _connection.Dispose();
 
     [Fact]
     public void ProcessClaim_RejectsWerewolf_WhenMedicineContainsSilver()

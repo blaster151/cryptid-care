@@ -1,4 +1,5 @@
 using CryptidCare.Data;
+using CryptidCare.Data.Repositories;
 using CryptidCare.Services;
 using CryptidCare.Services.Rules;
 using Microsoft.EntityFrameworkCore;
@@ -14,6 +15,9 @@ builder.Services.AddControllers()
 builder.Services.AddScoped<IClaimRule, SilverAllergyRule>();
 builder.Services.AddScoped<IClaimRule, HydraHeadMultiplierRule>();
 builder.Services.AddScoped<IClaimService, ClaimService>();
+builder.Services.AddScoped<IPatientRepository, PatientRepository>();
+builder.Services.AddScoped<IMedicineRepository, MedicineRepository>();
+builder.Services.AddScoped<IClaimRepository, ClaimRepository>();
 
 var app = builder.Build();
 
