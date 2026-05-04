@@ -30,4 +30,16 @@ public class ClaimsControllerTests
         Assert.Equal(ClaimStatus.Rejected, result.Status);
         Assert.NotNull(result.RejectionReason);
     }
+
+    [Fact]
+    public void ProcessClaim_MultipliesQuantityByHeadCount_ForHydra()
+    {
+        var hydra = new Patient(Guid.NewGuid(), "Lernaean", Species.Hydra, HeadCount: 3);
+        var medicine = new Medicine(Guid.NewGuid(), "Regeneron", ContainsSilver: false);
+
+        var result = _controller.ProcessClaim(hydra, medicine, quantity: 2);
+
+        Assert.Equal(ClaimStatus.Approved, result.Status);
+        Assert.Equal(6, result.DispensedQuantity);
+    }
 }

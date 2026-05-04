@@ -20,6 +20,9 @@ public class ClaimService : IClaimService
 
         _rulesEngine.Process(context);
 
-        return new ClaimResponse(context.Status, context.RejectionReason);
+        if (context.DispensedQuantity == 0)
+            context.DispensedQuantity = context.RequestedQuantity;
+
+        return new ClaimResponse(context.Status, context.DispensedQuantity, context.RejectionReason);
     }
 }
