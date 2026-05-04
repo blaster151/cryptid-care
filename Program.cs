@@ -1,3 +1,5 @@
+using CryptidCare.Services.Rules;
+
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers()

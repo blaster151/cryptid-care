@@ -1,6 +1,5 @@
 using CryptidCare.Controllers;
 using CryptidCare.Models;
-using Microsoft.AspNetCore.Mvc;
 
 namespace CryptidCare.Tests;
 
@@ -8,11 +7,15 @@ public class ClaimsControllerTests
 {
     private readonly ClaimsController _controller = new();
 
-    [Fact(Skip = "Not yet implemented")]
-    public void SubmitClaim_ReturnsApproved_WhenClaimIsValid()
+    [Fact]
+    public void ProcessClaim_RejectsWerewolf_WhenMedicineContainsSilver()
     {
-        var result = _controller.SubmitClaim();
+        var werewolf = new Patient(Guid.NewGuid(), "Remus Lupin", Species.Werewolf);
+        var silverMed = new Medicine(Guid.NewGuid(), "Silver Sulfadiazine", ContainsSilver: true);
 
-        var ok = Assert.IsType<ActionResult<ClaimResponse>>(result);
+        var result = _controller.ProcessClaim(werewolf, silverMed, quantity: 1);
+
+        Assert.Equal(ClaimStatus.Rejected, result.Status);
+        Assert.NotNull(result.RejectionReason);
     }
 }
