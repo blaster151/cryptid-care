@@ -1,11 +1,23 @@
 using CryptidCare.Controllers;
 using CryptidCare.Models;
+using CryptidCare.Services;
+using CryptidCare.Services.Rules;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace CryptidCare.Tests;
 
 public class ClaimsControllerTests
 {
-    private readonly ClaimsController _controller = new();
+    private readonly ClaimsController _controller;
+
+    public ClaimsControllerTests()
+    {
+        var services = new ServiceCollection();
+        services.AddScoped<IClaimRule, SilverAllergyRule>();
+        services.AddScoped<IClaimService, ClaimService>();
+        services.AddScoped<ClaimsController>();
+        _controller = services.BuildServiceProvider().GetRequiredService<ClaimsController>();
+    }
 
     [Fact]
     public void ProcessClaim_RejectsWerewolf_WhenMedicineContainsSilver()

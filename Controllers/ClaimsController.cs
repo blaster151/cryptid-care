@@ -1,4 +1,5 @@
 using CryptidCare.Models;
+using CryptidCare.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CryptidCare.Controllers;
@@ -7,6 +8,10 @@ namespace CryptidCare.Controllers;
 [Route("claims")]
 public class ClaimsController : ControllerBase
 {
+    private readonly IClaimService _claimService;
+
+    public ClaimsController(IClaimService claimService) => _claimService = claimService;
+
     [HttpPost]
     public ActionResult<ClaimResponse> SubmitClaim([FromBody] SubmitClaimRequest request)
     {
@@ -15,7 +20,5 @@ public class ClaimsController : ControllerBase
     }
 
     public ClaimResponse ProcessClaim(Patient patient, Medicine medicine, int quantity)
-    {
-        throw new NotImplementedException();
-    }
+        => _claimService.ProcessClaim(patient, medicine, quantity);
 }
