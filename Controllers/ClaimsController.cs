@@ -30,15 +30,24 @@ public class ClaimsController : ControllerBase
     public async Task<ActionResult<ClaimResponse>> SubmitClaim([FromBody] SubmitClaimRequest request)
     {
         var patient = await _patients.GetByIdAsync(request.PatientId);
+        if (patient is null)
+            return NotFound($"Patient '{request.PatientId}' not found.");
+
         var medicine = await _medicines.GetByIdAsync(request.MedicineId);
+        if (medicine is null)
+            return NotFound($"Medicine '{request.MedicineId}' not found.");
 
-        var result = ProcessClaim(patient!, medicine!, request.Quantity);
+        if (!Enum.IsDefined(patient.Species))
+            return UnprocessableEntity($"Patient '{patient.Id}' has unrecognized species value '{(int)patient.Species}'.");
 
+        var result = ProcessClaim(patient, medicine, request.Quantity);
+
+        var claimId = Guid.NewGuid();
         await _claims.AddAsync(new Claim
         {
-            Id = Guid.NewGuid(),
-            PatientId = patient!.Id,
-            MedicineId = medicine!.Id,
+            Id = claimId,
+            PatientId = patient.Id,
+            MedicineId = medicine.Id,
             ExternalReferenceId = request.ExternalReferenceId,
             RequestedQuantity = request.Quantity,
             DispensedQuantity = result.DispensedQuantity,
@@ -47,9 +56,10 @@ public class ClaimsController : ControllerBase
             CreatedAt = DateTime.UtcNow
         });
 
-        return Ok(result);
+        return Ok(result with { ClaimId = claimId });
     }
 
+    [NonAction]
     public ClaimResponse ProcessClaim(Patient patient, Medicine medicine, int quantity)
         => _claimService.ProcessClaim(patient, medicine, quantity);
 }

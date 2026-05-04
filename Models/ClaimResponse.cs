@@ -6,4 +6,4 @@ public enum ClaimStatus
     Rejected
 }
 
-public record ClaimResponse(ClaimStatus Status, int DispensedQuantity, string? RejectionReason = null);
+public record ClaimResponse(ClaimStatus Status, int DispensedQuantity, string? RejectionReason = null, Guid? ClaimId = null);
