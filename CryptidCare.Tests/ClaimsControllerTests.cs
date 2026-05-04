@@ -23,8 +23,8 @@ public class ClaimsControllerTests
     [Fact]
     public void ProcessClaim_RejectsWerewolf_WhenMedicineContainsSilver()
     {
-        var werewolf = new Patient(Guid.NewGuid(), "Remus Lupin", Species.Werewolf);
-        var silverMed = new Medicine(Guid.NewGuid(), "Silver Sulfadiazine", ContainsSilver: true);
+        var werewolf = new Patient { Id = Guid.NewGuid(), Name = "Remus Lupin", Species = Species.Werewolf };
+        var silverMed = new Medicine { Id = Guid.NewGuid(), Name = "Silver Sulfadiazine", ContainsSilver = true };
 
         var result = _controller.ProcessClaim(werewolf, silverMed, quantity: 1);
 
@@ -35,8 +35,8 @@ public class ClaimsControllerTests
     [Fact]
     public void ProcessClaim_MultipliesQuantityByHeadCount_ForHydra()
     {
-        var hydra = new Patient(Guid.NewGuid(), "Lernaean", Species.Hydra, HeadCount: 3);
-        var medicine = new Medicine(Guid.NewGuid(), "Regeneron", ContainsSilver: false);
+        var hydra = new Patient { Id = Guid.NewGuid(), Name = "Lernaean", Species = Species.Hydra, HeadCount = 3 };
+        var medicine = new Medicine { Id = Guid.NewGuid(), Name = "Regeneron", ContainsSilver = false };
 
         var result = _controller.ProcessClaim(hydra, medicine, quantity: 2);
 
