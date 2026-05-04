@@ -30,6 +30,7 @@ public class ClaimsControllerTests
 
         Assert.Equal(ClaimStatus.Rejected, result.Status);
         Assert.NotNull(result.RejectionReason);
+        Assert.Equal(0, result.DispensedQuantity);
     }
 
     [Fact]
