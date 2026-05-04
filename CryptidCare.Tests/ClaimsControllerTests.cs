@@ -14,6 +14,7 @@ public class ClaimsControllerTests
     {
         var services = new ServiceCollection();
         services.AddScoped<IClaimRule, SilverAllergyRule>();
+        services.AddScoped<IClaimRule, HydraHeadMultiplierRule>();
         services.AddScoped<IClaimService, ClaimService>();
         services.AddScoped<ClaimsController>();
         _controller = services.BuildServiceProvider().GetRequiredService<ClaimsController>();

@@ -7,6 +7,7 @@ builder.Services.AddControllers()
     .AddJsonOptions(o => o.JsonSerializerOptions.Converters.Add(new System.Text.Json.Serialization.JsonStringEnumConverter()));
 
 builder.Services.AddScoped<IClaimRule, SilverAllergyRule>();
+builder.Services.AddScoped<IClaimRule, HydraHeadMultiplierRule>();
 builder.Services.AddScoped<IClaimService, ClaimService>();
 
 var app = builder.Build();
