@@ -105,7 +105,7 @@ docker compose up --build
 ```
 
 This starts three services:
-1. **db** — SQL Server 2022 Developer Edition
+1. **db** — SQL Server 2022 (Developer Edition in Docker; Express also works for local dev)
 2. **db-init** — runs `Database/init.sql` once (creates database, tables, and seed data)
 3. **api** — the CryptidCare API, available at `http://localhost:8080`
 
