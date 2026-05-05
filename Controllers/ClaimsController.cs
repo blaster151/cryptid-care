@@ -1,6 +1,7 @@
 using CryptidCare.Data.Repositories;
 using CryptidCare.Models;
 using CryptidCare.Services;
+using CryptidCare.Services.Rules;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CryptidCare.Controllers;
@@ -40,7 +41,8 @@ public class ClaimsController : ControllerBase
         if (!Enum.IsDefined(patient.Species))
             return UnprocessableEntity($"Patient '{patient.Id}' has unrecognized species value '{(int)patient.Species}'.");
 
-        var result = ProcessClaim(patient, medicine, request.Quantity);
+        var recentClaims = await _claims.GetRecentApprovedAsync(patient.Id, medicine.Id, RefillCooldownRule.CooldownDays);
+        var result = ProcessClaim(patient, medicine, request.Quantity, recentClaims);
 
         var claimId = Guid.NewGuid();
         await _claims.AddAsync(new Claim
@@ -60,6 +62,6 @@ public class ClaimsController : ControllerBase
     }
 
     [NonAction]
-    public ClaimResponse ProcessClaim(Patient patient, Medicine medicine, int quantity)
-        => _claimService.ProcessClaim(patient, medicine, quantity);
+    public ClaimResponse ProcessClaim(Patient patient, Medicine medicine, int quantity, IEnumerable<Claim>? recentApprovedClaims = null)
+        => _claimService.ProcessClaim(patient, medicine, quantity, recentApprovedClaims);
 }

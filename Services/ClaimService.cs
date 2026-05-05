@@ -9,13 +9,14 @@ public class ClaimService : IClaimService
 
     public ClaimService(IEnumerable<IClaimRule> rules) => _rulesEngine = new ClaimRulesEngine(rules);
 
-    public ClaimResponse ProcessClaim(Patient patient, Medicine medicine, int quantity)
+    public ClaimResponse ProcessClaim(Patient patient, Medicine medicine, int quantity, IEnumerable<Claim>? recentApprovedClaims = null)
     {
         var context = new ClaimContext
         {
             Patient = patient,
             Medicine = medicine,
-            RequestedQuantity = quantity
+            RequestedQuantity = quantity,
+            RecentApprovedClaims = recentApprovedClaims ?? []
         };
 
         _rulesEngine.Process(context);

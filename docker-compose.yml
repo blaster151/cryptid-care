@@ -2,12 +2,43 @@ services:
   db:
     image: mcr.microsoft.com/mssql/server:2022-latest
     environment:
-      SA_PASSWORD: "CryptidCare_Dev1"
+      SA_PASSWORD: "CryptidCare_Dev1!"
       ACCEPT_EULA: "Y"
+      MSSQL_PID: "Developer"
     ports:
       - "1433:1433"
+    volumes:
+      - sqldata:/var/opt/mssql
     healthcheck:
-      test: ["CMD", "/opt/mssql-tools18/bin/sqlcmd", "-S", "localhost", "-U", "sa", "-P", "CryptidCare_Dev1", "-Q", "SELECT 1", "-No"]
+      test: ["CMD", "/opt/mssql-tools18/bin/sqlcmd", "-S", "localhost", "-U", "sa", "-P", "CryptidCare_Dev1!", "-Q", "SELECT 1", "-C"]
       interval: 10s
       retries: 10
-      start_period: 20s
+      start_period: 30s
+
+  db-init:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - ./Database:/scripts
+    entrypoint: >
+      /bin/bash -c "
+        /opt/mssql-tools18/bin/sqlcmd -S db -U sa -P 'CryptidCare_Dev1!' -i /scripts/init.sql -C
+      "
+    restart: "no"
+
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      ConnectionStrings__DefaultConnection: "Server=db;Database=CryptidCare;User Id=sa;Password=CryptidCare_Dev1!;TrustServerCertificate=True;"
+
+volumes:
+  sqldata:

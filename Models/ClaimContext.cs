@@ -5,6 +5,7 @@ public class ClaimContext
     public required Patient Patient { get; init; }
     public required Medicine Medicine { get; init; }
     public required int RequestedQuantity { get; init; }
+    public IEnumerable<Claim> RecentApprovedClaims { get; init; } = [];
 
     // Explicitly set by rules (e.g. Hydra multiplier); 0 until assigned
     public int DispensedQuantity { get; set; }

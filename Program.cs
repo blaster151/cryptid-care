@@ -16,6 +16,7 @@ builder.Services.AddControllers()
 
 builder.Services.AddScoped<IClaimRule, SilverAllergyRule>();
 builder.Services.AddScoped<IClaimRule, HydraHeadMultiplierRule>();
+builder.Services.AddScoped<IClaimRule, RefillCooldownRule>();
 builder.Services.AddScoped<IClaimService, ClaimService>();
 builder.Services.AddScoped<IPatientRepository, PatientRepository>();
 builder.Services.AddScoped<IMedicineRepository, MedicineRepository>();

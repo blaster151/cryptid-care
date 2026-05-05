@@ -33,3 +33,7 @@ secrets.json
 # OS
 .DS_Store
 Thumbs.db
+
+# Copilot CLI tool artifacts
+.playwright-mcp/
+*.png

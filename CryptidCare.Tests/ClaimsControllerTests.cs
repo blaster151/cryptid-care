@@ -23,6 +23,7 @@ public class ClaimsControllerTests : IDisposable
         var services = new ServiceCollection();
         services.AddScoped<IClaimRule, SilverAllergyRule>();
         services.AddScoped<IClaimRule, HydraHeadMultiplierRule>();
+        services.AddScoped<IClaimRule, RefillCooldownRule>();
         services.AddScoped<IClaimService, ClaimService>();
         services.AddDbContext<CryptidCareDbContext>(o =>
             o.UseSqlite(_connection));
@@ -61,5 +62,38 @@ public class ClaimsControllerTests : IDisposable
 
         Assert.Equal(ClaimStatus.Approved, result.Status);
         Assert.Equal(6, result.DispensedQuantity);
+    }
+
+    [Fact]
+    public void ProcessClaim_RejectsClaim_WhenRecentApprovedClaimExists()
+    {
+        var patient = new Patient { Id = Guid.NewGuid(), Name = "Fawkes", Species = Species.Phoenix };
+        var medicine = new Medicine { Id = Guid.NewGuid(), Name = "Regeneron", ContainsSilver = false };
+        var recentClaim = new Claim
+        {
+            Id = Guid.NewGuid(),
+            PatientId = patient.Id,
+            MedicineId = medicine.Id,
+            Status = ClaimStatus.Approved,
+            CreatedAt = DateTime.UtcNow.AddDays(-5)
+        };
+
+        var result = _controller.ProcessClaim(patient, medicine, quantity: 1, recentApprovedClaims: [recentClaim]);
+
+        Assert.Equal(ClaimStatus.Rejected, result.Status);
+        Assert.NotNull(result.RejectionReason);
+        Assert.Contains("30 days", result.RejectionReason);
+    }
+
+    [Fact]
+    public void ProcessClaim_ApprovesClaim_WhenNoRecentApprovedClaimsExist()
+    {
+        var patient = new Patient { Id = Guid.NewGuid(), Name = "Fawkes", Species = Species.Phoenix };
+        var medicine = new Medicine { Id = Guid.NewGuid(), Name = "Regeneron", ContainsSilver = false };
+
+        var result = _controller.ProcessClaim(patient, medicine, quantity: 1, recentApprovedClaims: []);
+
+        Assert.Equal(ClaimStatus.Approved, result.Status);
+        Assert.Equal(1, result.DispensedQuantity);
     }
 }

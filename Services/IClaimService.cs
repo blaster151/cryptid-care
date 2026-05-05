@@ -4,5 +4,5 @@ namespace CryptidCare.Services;
 
 public interface IClaimService
 {
-    ClaimResponse ProcessClaim(Patient patient, Medicine medicine, int quantity);
+    ClaimResponse ProcessClaim(Patient patient, Medicine medicine, int quantity, IEnumerable<Claim>? recentApprovedClaims = null);
 }
